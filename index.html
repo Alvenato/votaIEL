@@ -295,7 +295,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 13px;
-            padding: 6px 0;
+            padding: 8px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             color: var(--text-body);
         }
@@ -398,7 +398,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Rodapé Fixo com Fontes Customizadas */
+        /* Rodapé Fixo com a Cor Azul Institucional da Logo (var(--accent-blue)) */
         .app-footer {
             position: fixed;
             bottom: 20px;
@@ -406,20 +406,14 @@
             width: 100%;
             text-align: center;
             letter-spacing: 0.04em;
-            pointer-events: none; /* Não bloqueia interações na página */
+            pointer-events: none; /* Não bloqueia cliques na página */
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--accent-blue); /* Azul Sólido Corporativo */
         }
 
         .footer-tm {
-            font-size: 9px;
             font-weight: 700;
-            color: var(--text-title);
-            margin-right: 2px;
-        }
-
-        .footer-text {
-            font-size: 8px;
-            font-weight: 500;
-            color: var(--text-muted);
         }
     </style>
 </head>
@@ -429,6 +423,7 @@
         <img src="https://www.ielbahia.com.br/wp-content/uploads/2023/09/Logo-do-navbar-1.png" alt="Logo IEL" class="brand-logo">
 
         <div class="container">
+            <!-- TELA 1: VALIDAÇÃO -->
             <div id="screen-validation" class="screen active">
                 <h2>Validação de Acesso</h2>
                 <div class="subtitle">Identifique-se utilizando seu nome corporativo ou credencial cadastrada.</div>
@@ -440,6 +435,7 @@
                 <button id="btn-validar" onclick="validarMatricula()">Validar Identidade</button>
             </div>
 
+            <!-- TELA 2: VOTAÇÃO -->
             <div id="screen-voting" class="screen">
                 <h2>Cédula de Votação</h2>
                 <div class="badge-matricula">Sessão Ativa: <span id="display-matricula"></span></div>
@@ -462,6 +458,7 @@
                 <button id="btn-votar" onclick="computarVoto()" style="background-color: var(--success-green); box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);">Confirmar Escolha</button>
             </div>
 
+            <!-- TELA 3: RANKING -->
             <div id="screen-results" class="screen">
                 <h2 id="results-title" style="color: var(--success-green);">✔ Voto Computado</h2>
                 <div id="results-subtitle" class="subtitle">Métricas consolidadas e auditadas em tempo real.</div>
@@ -477,14 +474,17 @@
                 </button>
             </div>
 
+            <!-- TELA 4: RELATÓRIO DETALHADO (ADMIN 0911) -->
             <div id="screen-report" class="screen">
                 <h2>Painel de Auditoria Interna</h2>
                 <div class="subtitle">Ambiente exclusivo da mesa diretora e comitê eleitoral do IEL.</div>
                 
+                <!-- COMPONENTE: TOP 3 PROJETOS MAIS VOTADOS COM EMOTICON DE LÍDER -->
                 <div class="audit-top-podium">
                     <div class="podium-title">📊 Propostas Líderes (Top 3)</div>
                     <div id="podium-list">
-                        </div>
+                        <!-- Gerado dinamicamente via JS -->
+                    </div>
                 </div>
 
                 <div class="report-summary">
@@ -512,8 +512,9 @@
         </div>
     </div>
     
+    <!-- RODAPÉ ATUALIZADO EM AZUL SÓLIDO CORPORATIVO -->
     <div class="app-footer">
-        <span class="footer-tm">&trade;</span><span class="footer-text">Desenvolvido por AiLytics</span>
+        <span>Desenvolvido por AiLytics</span><span class="footer-tm">™</span>
     </div>
 
     <script>
@@ -682,13 +683,20 @@
 
             const entradasOrdenadas = Object.entries(bancoDeVotos).sort((a, b) => b[1] - a[1]);
             
+            // Identifica qual o maior número de votos atual na liderança (caso haja votos computados)
+            const maxVotosAtuais = entradasOrdenadas[0] ? entradasOrdenadas[0][1] : 0;
+            
             for (let i = 0; i < 3; i++) {
                 if (entradasOrdenadas[i]) {
                     const nome = entradasOrdenadas[i][0];
                     const votos = entradasOrdenadas[i][1];
+                    
+                    // Adiciona o emoticon 🏆 apenas se o item tiver votos E for igual ao maior valor (líder absoluto ou empatado)
+                    const iconeTrofeu = (votos > 0 && votos === maxVotosAtuais) ? " 🏆" : "";
+                    
                     const item = document.createElement('div');
                     item.className = 'podium-item';
-                    item.innerHTML = `<span><strong>${i + 1}º</strong> — ${nome}</span> <span>${votos} ${votos === 1 ? 'voto' : 'votos'}</span>`;
+                    item.innerHTML = `<span><strong>${i + 1}º</strong> — ${nome}${iconeTrofeu}</span> <span>${votos} ${votos === 1 ? 'voto' : 'votos'}</span>`;
                     podiumList.appendChild(item);
                 }
             }
