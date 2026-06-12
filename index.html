@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Decisório de IA - IEL</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Fundo Claro Sutil */
+            --bg-light: #f4f4f2;
+            
+            /* Containers e Quadrinhos no Escuro Executivo */
+            --panel-bg: #0f172a; /* Slate escuro profundo */
+            --card-bg: rgba(30, 41, 59, 0.7); /* Azul cinzento escuro para as opções */
+            --card-hover: rgba(51, 65, 85, 0.8);
+            --border-glow: rgba(255, 255, 255, 0.06);
+            
+            /* Identidade Visual e Textos Internos */
+            --accent-blue: #3b82f6; /* Azul moderno brilhante para destacar no escuro */
+            --accent-hover: #2563eb;
+            --success-green: #10b981; /* Verde esmeralda de alta performance */
+            --text-title: #ffffff; /* Texto branco para alto contraste dentro do painel escuro */
+            --text-body: #cbd5e1;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Fundo branco/creme executivo limpo da primeira versão */
+            background: radial-gradient(circle at center, #ffffff 0%, var(--bg-light) 100%);
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        .wrapper-main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 560px;
+            position: relative;
+        }
+
+        .brand-logo {
+            max-width: 140px;
+            height: auto;
+            margin-bottom: 32px;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
+        }
+
+        .container {
+            /* Quadrinho principal na cor escura executiva */
+            background: var(--panel-bg); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 48px 40px;
+            border-radius: 16px;
+            box-shadow: 
+                0 10px 30px -5px rgba(15, 23, 42, 0.3),
+                0 30px 60px -15px rgba(15, 23, 42, 0.2),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            animation: interfaceIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .active {
+            display: block;
+        }
+
+        @keyframes interfaceIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-title);
+            margin-top: 0;
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+
+        .voting-question {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-title);
+            line-height: 1.6;
+            margin: 28px 0 20px 0;
+            text-align: left;
+            border-left: 3px solid var(--accent-blue);
+            padding-left: 16px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px 18px;
+            font-size: 15px;
+            color: var(--text-title);
+            background: #090d16;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: all 0.25s ease;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: #04060a;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background-color: #1e293b !important;
+            color: var(--text-muted) !important;
+            cursor: not-allowed;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        .options-container {
+            text-align: left;
+            margin: 20px 0 32px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px 18px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            font-size: 14.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: var(--text-body);
+        }
+
+        .option:hover {
+            background: var(--card-hover);
+            color: var(--text-title);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .option input {
+            margin-right: 14px;
+            transform: scale(1.15);
+            accent-color: var(--accent-blue);
+        }
+
+        .option.selected {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: var(--accent-blue);
+            color: var(--text-title);
+            font-weight: 600;
+        }
+
+        .badge-matricula {
+            display: inline-block;
+            background: #090d16;
+            color: #94a3b8;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            letter-spacing: 0.02em;
+        }
+
+        .error-msg {
+            color: #f87171;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 6px;
+            margin-bottom: 14px;
+            text-align: left;
+            min-height: 20px;
+        }
+
+        .chart-container {
+            margin: 28px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            text-align: left;
+            max-height: 340px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .chart-container::-webkit-scrollbar { width: 4px; }
+        .chart-container::-webkit-scrollbar-track { background: transparent; }
+        .chart-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+
+        .chart-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13.5px;
+            font-weight: 500;
+        }
+
+        .chart-project-name { color: var(--text-title); }
+        .chart-votes-count { font-weight: 600; color: var(--text-muted); }
+
+        .bar-track {
+            width: 100%;
+            height: 8px;
+            background: #090d16;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+            background-color: var(--success-green); 
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .report-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #090d16;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-title);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .report-badge {
+            background-color: var(--accent-blue);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .table-wrapper {
+            max-height: 240px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin: 24px 0;
+            background: rgba(9, 13, 22, 0.4);
+        }
+
+        .table-wrapper::-webkit-scrollbar { width: 4px; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #090d16;
+            color: var(--text-title);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            padding: 16px;
+            position: sticky;
+            top: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        td {
+            padding: 15px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: var(--text-body);
+        }
+
+        tr:nth-child(even) { background: rgba(255, 255, 255, 0.01); }
+        tr:last-child td { border-bottom: none; }
+        
+        .no-data {
+            padding: 36px;
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        
+        .btn-secondary {
+            background-color: transparent !important;
+            color: var(--text-body) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: none !important;
+        }
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.03) !important;
+            color: var(--text-title) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper-main">
+        <img src="https://www.ielbahia.com.br/wp-content/uploads/2023/09/Logo-do-navbar-1.png" alt="Logo IEL" class="brand-logo">
+
+        <div class="container">
+            <div id="screen-validation" class="screen active">
+                <h2>Validação de Acesso</h2>
+                <div class="subtitle">Identifique-se utilizando seu nome corporativo ou credencial cadastrada.</div>
+                
+                <div class="input-group">
+                    <input type="text" id="input-matricula" placeholder="Informe seu identificador" autocomplete="off">
+                    <div id="validation-error" class="error-msg"></div>
+                </div>
+                <button id="btn-validar" onclick="validarMatricula()">Validar Identidade</button>
+            </div>
+
+            <div id="screen-voting" class="screen">
+                <h2>Cédula de Votação</h2>
+                <div class="badge-matricula">Sessão Ativa: <span id="display-matricula"></span></div>
+                
+                <div class="voting-question">
+                    Qual vertente estratégica de IA possui maior viabilidade e retorno para o IEL?
+                </div>
+                
+                <div class="options-container">
+                    <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Ações Internas"> 1. Ações Internas</label>
+                    <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="COD"> 2. COD</label>
+                    <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Desenvolvimento de carreiras"> 3. Desenvolvimento de carreiras</label>
+                    <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Educação Executiva"> 4. Educação Executiva</label>
+                    <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Estratégia e Articulação"> 5. Estratégia e Articulação</label>
+                    <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Gestão Empresarial"> 6. Gestão Empresarial</label>
+                    <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Pesquisa e Inovação"> 7. Pesquisa e Inovação</label>
+                </div>
+                
+                <div id="voting-error" class="error-msg"></div>
+                <button id="btn-votar" onclick="computarVoto()" style="background-color: var(--success-green); box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);">Confirmar Escolha</button>
+            </div>
+
+            <div id="screen-results" class="screen">
+                <h2 id="results-title" style="color: var(--success-green);">✔ Voto Computado</h2>
+                <div id="results-subtitle" class="subtitle">Métricas consolidadas e auditadas em tempo real.</div>
+                
+                <div style="text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 18px;">
+                    Ranking Consolidado das Propostas
+                </div>
+                
+                <div id="chart-container" class="chart-container"></div>
+                
+                <button id="btn-finalizar-sessao" class="btn-secondary" onclick="proximoEleitor()" style="margin-top: 12px;">
+                    Finalizar Sessão
+                </button>
+            </div>
+
+            <div id="screen-report" class="screen">
+                <h2>Painel de Auditoria Interna</h2>
+                <div class="subtitle">Ambiente exclusivo da mesa diretora e comitê eleitoral do IEL.</div>
+                
+                <div class="report-summary">
+                    <span>Amostragens Registradas</span>
+                    <span id="report-total-counter" class="report-badge">0</span>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Colaborador</th>
+                                <th>Escopo do Projeto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <button class="btn-secondary" onclick="fecharRelatorio()">
+                    Sair do Modo de Auditoria
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-opzKE6vsKZvIzcatEQgxVmy0ii0LFoC8bn52hVYbepIreYvzKcxYWIasWY48AEZ6kA/exec";
+
+        const listaVotantesPermitidos = ["Bárbara", "Carol", "Cibele", "Gabriella", "Hugo", "Madu", "Naiara", "Vitória"];
+        
+        let bancoDeVotos = { "Ações Internas": 0, "COD": 0, "Desenvolvimento de carreiras": 0, "Educação Executiva": 0, "Estratégia e Articulação": 0, "Gestão Empresarial": 0, "Pesquisa e Inovação": 0 };
+        let matriculasQueJaVotaram = [];
+        let historicoVotosCompleto = [];
+        let matriculaAtual = "";
+        let idIntervaloConfete;
+
+        function destacarOpcao(elementoSelecionado) {
+            const opcoes = document.querySelectorAll('.option');
+            opcoes.forEach(op => op.classList.remove('selected'));
+            elementoSelecionado.classList.add('selected');
+        }
+
+        async function sincronizarDadosComNuvem() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const dados = await response.json();
+                
+                Object.keys(bancoDeVotos).forEach(key => bancoDeVotos[key] = 0);
+                matriculasQueJaVotaram = [];
+                historicoVotosCompleto = dados;
+
+                dados.forEach(item => {
+                    if (bancoDeVotos[item.projeto] !== undefined) {
+                        bancoDeVotos[item.projeto] += 1;
+                    }
+                    matriculasQueJaVotaram.push(item.colaborador);
+                });
+            } catch (error) {
+                console.error("Erro critico na sincronização:", error);
+            }
+        }
+
+        async function validarMatricula() {
+            const input = document.getElementById('input-matricula');
+            const errorDiv = document.getElementById('validation-error');
+            const btn = document.getElementById('btn-validar');
+            const matricula = input.value.trim();
+
+            if (matricula === "") { errorDiv.innerText = "Campo obrigatório. Insira seu identificador."; return; }
+            
+            if (matricula === "0911") {
+                input.value = ""; errorDiv.innerText = "";
+                btn.innerHTML = '<span class="loading-spinner"></span>Acessando ambiente criptografado...';
+                btn.disabled = true;
+                await sincronizarDadosComNuvem();
+                btn.innerHTML = 'Validar Identidade';
+                btn.disabled = false;
+                abrirRelatorio();
+                return;
+            }
+
+            if (!listaVotantesPermitidos.includes(matricula)) {
+                errorDiv.innerText = "Credencial não localizada no escopo de votantes cadastrados.";
+                return;
+            }
+
+            btn.innerHTML = '<span class="loading-spinner"></span>Auditando base corporativa...';
+            btn.disabled = true;
+            
+            await sincronizarDadosComNuvem();
+
+            btn.innerHTML = 'Validar Identidade';
+            btn.disabled = false;
+
+            if (matriculasQueJaVotaram.includes(matricula)) {
+                errorDiv.innerText = "Conformidade violada: Esta credencial já realizou um voto.";
+                return;
+            }
+
+            matriculaAtual = matricula;
+            errorDiv.innerText = "";
+            document.getElementById('display-matricula').innerText = matriculaAtual;
+            trocarTela('screen-validation', 'screen-voting');
+        }
+
+        async function computarVoto() {
+            const opcoes = document.getElementsByName('project');
+            const errorDiv = document.getElementById('voting-error');
+            const btn = document.getElementById('btn-votar');
+            let opcaoSelecionada = "";
+
+            for (const opcao of opcoes) { if (opcao.checked) { opcaoSelecionada = opcao.value; break; } }
+            if (!opcaoSelecionada) { errorDiv.innerText = "Selecione uma diretriz estratégica antes de salvar."; return; }
+
+            btn.innerHTML = '<span class="loading-spinner"></span>Registrando decisão em Ledger Seguro...';
+            btn.disabled = true;
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ colaborador: matriculaAtual, projeto: opcaoSelecionada })
+                });
+
+                await new Promise(resolve => setTimeout(resolve, 1200));
+                await sincronizarDadosComNuvem();
+
+                trocarTela('screen-voting', 'screen-results');
+                renderizarGraficoBarras();
+                verificarTerminoVotacao();
+            } catch (error) {
+                errorDiv.innerText = "Instabilidade na rede de dados. Tente novamente.";
+            } finally {
+                btn.innerHTML = 'Confirmar Escolha';
+                btn.disabled = false;
+            }
+        }
+
+        function renderizarGraficoBarras() {
+            const chartContainer = document.getElementById('chart-container');
+            chartContainer.innerHTML = ""; 
+
+            const entradasVotos = Object.entries(bancoDeVotos).sort((a, b) => b[1] - a[1]);
+            const maiorVotacao = entradasVotos[0][1] > 0 ? entradasVotos[0][1] : 1;
+
+            entradasVotos.forEach((projeto, index) => {
+                const nomeProjeto = projeto[0], totalVotos = projeto[1], percentualLargura = (totalVotos / maiorVotacao) * 100;
+                const row = document.createElement('div');
+                row.className = 'chart-row';
+                row.innerHTML = `
+                    <div class="chart-labels">
+                        <span class="chart-project-name"><strong>${index + 1}º</strong> — ${nomeProjeto}</span>
+                        <span class="chart-votes-count">${totalVotos} ${totalVotos === 1 ? 'voto' : 'votos'}</span>
+                    </div>
+                    <div class="bar-track"><div id="bar-fill-${index}" class="bar-fill"></div></div>`;
+                chartContainer.appendChild(row);
+                setTimeout(() => { const bf = document.getElementById(`bar-fill-${index}`); if (bf) bf.style.width = `${percentualLargura}%`; }, 40);
+            });
+        }
+
+        function verificarTerminoVotacao() {
+            if (matriculasQueJaVotaram.length >= listaVotantesPermitidos.length) {
+                document.getElementById('results-title').innerText = "🎉 Processo Encerrado";
+                document.getElementById('results-title').style.color = "var(--accent-blue)";
+                document.getElementById('results-subtitle').innerText = "100% dos votantes registrados concluíram a participação.";
+                document.getElementById('btn-finalizar-sessao').style.display = "none";
+                dispararChuvasDeConfete();
+            }
+        }
+
+        function dispararChuvasDeConfete() {
+            const duracao = 5 * 1000; const fim = Date.now() + duracao;
+            idIntervaloConfete = setInterval(function() {
+                if (fim - Date.now() <= 0) return clearInterval(idIntervaloConfete);
+                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.85 }, colors: ['#3b82f6', '#10b981'] });
+                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.85 }, colors: ['#3b82f6', '#10b981'] });
+            }, 180);
+        }
+
+        function abrirRelatorio() {
+            const tbody = document.getElementById('report-table-body');
+            const totalCounter = document.getElementById('report-total-counter');
+            tbody.innerHTML = ""; totalCounter.innerText = historicoVotosCompleto.length;
+
+            if (historicoVotosCompleto.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="no-data">Nenhum registro encontrado no servidor central.</td></tr>`;
+            } else {
+                historicoVotosCompleto.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td><strong>${item.colaborador}</strong></td><td>${item.projeto}</td>`;
+                    tbody.appendChild(tr);
+                });
+            }
+            trocarTela('screen-validation', 'screen-report');
+        }
+
+        function fecharRelatorio() { trocarTela('screen-report', 'screen-validation'); }
+
+        function trocarTela(telaAtualId, novaTelaId) {
+            document.getElementById(telaAtualId).classList.remove('active');
+            document.getElementById(novaTelaId).classList.add('active');
+        }
+
+        function proximoEleitor() {
+            clearInterval(idIntervaloConfete);
+            document.getElementById('input-matricula').value = "";
+            document.getElementById('validation-error').innerText = "";
+            document.getElementById('voting-error').innerText = "";
+            const opcoes = document.getElementsByName('project');
+            for (const o of opcoes) o.checked = false;
+            document.querySelectorAll('.option').forEach(op => op.classList.remove('selected'));
+            matriculaAtual = "";
+            
+            trocarTela('screen-results', 'screen-validation');
+        }
+    </script>
+</body>
+</html>
