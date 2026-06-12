@@ -12,23 +12,22 @@
             --bg-light: #f4f4f2;
             
             /* Containers e Quadrinhos no Escuro Executivo */
-            --panel-bg: #0f172a; /* Slate escuro profundo */
-            --card-bg: rgba(30, 41, 59, 0.7); /* Azul cinzento escuro para as opções */
+            --panel-bg: #0f172a; 
+            --card-bg: rgba(30, 41, 59, 0.7); 
             --card-hover: rgba(51, 65, 85, 0.8);
             --border-glow: rgba(255, 255, 255, 0.06);
             
             /* Identidade Visual e Textos Internos */
-            --accent-blue: #3b82f6; /* Azul moderno brilhante para destacar no escuro */
+            --accent-blue: #3b82f6; 
             --accent-hover: #2563eb;
-            --success-green: #10b981; /* Verde esmeralda de alta performance */
-            --text-title: #ffffff; /* Texto branco para alto contraste dentro do painel escuro */
+            --success-green: #10b981; 
+            --text-title: #ffffff; 
             --text-body: #cbd5e1;
             --text-muted: #64748b;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            /* Fundo branco/creme executivo limpo da primeira versão */
             background: radial-gradient(circle at center, #ffffff 0%, var(--bg-light) 100%);
             background-attachment: fixed;
             display: flex;
@@ -57,7 +56,6 @@
         }
 
         .container {
-            /* Quadrinho principal na cor escura executiva */
             background: var(--panel-bg); 
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -273,6 +271,36 @@
             box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
         }
 
+        /* Seção do Painel de Auditoria */
+        .audit-top-podium {
+            background: rgba(9, 13, 22, 0.6);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .podium-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 12px;
+        }
+
+        .podium-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-body);
+        }
+        .podium-item:last-child { border-bottom: none; }
+        .podium-item strong { color: var(--text-title); }
+
         .report-summary {
             display: flex;
             justify-content: space-between;
@@ -284,7 +312,7 @@
             font-weight: 600;
             color: var(--text-title);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: 24px;
+            margin-bottom: 18px;
         }
 
         .report-badge {
@@ -297,11 +325,11 @@
         }
 
         .table-wrapper {
-            max-height: 240px;
+            max-height: 200px;
             overflow-y: auto;
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 8px;
-            margin: 24px 0;
+            margin-bottom: 24px;
             background: rgba(9, 13, 22, 0.4);
         }
 
@@ -322,14 +350,14 @@
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 0.08em;
-            padding: 16px;
+            padding: 14px 16px;
             position: sticky;
             top: 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         td {
-            padding: 15px 16px;
+            padding: 12px 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.02);
             color: var(--text-body);
         }
@@ -376,6 +404,7 @@
         <img src="https://www.ielbahia.com.br/wp-content/uploads/2023/09/Logo-do-navbar-1.png" alt="Logo IEL" class="brand-logo">
 
         <div class="container">
+            <!-- TELA 1: VALIDAÇÃO -->
             <div id="screen-validation" class="screen active">
                 <h2>Validação de Acesso</h2>
                 <div class="subtitle">Identifique-se utilizando seu nome corporativo ou credencial cadastrada.</div>
@@ -387,6 +416,7 @@
                 <button id="btn-validar" onclick="validarMatricula()">Validar Identidade</button>
             </div>
 
+            <!-- TELA 2: VOTAÇÃO -->
             <div id="screen-voting" class="screen">
                 <h2>Cédula de Votação</h2>
                 <div class="badge-matricula">Sessão Ativa: <span id="display-matricula"></span></div>
@@ -409,6 +439,7 @@
                 <button id="btn-votar" onclick="computarVoto()" style="background-color: var(--success-green); box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);">Confirmar Escolha</button>
             </div>
 
+            <!-- TELA 3: RANKING -->
             <div id="screen-results" class="screen">
                 <h2 id="results-title" style="color: var(--success-green);">✔ Voto Computado</h2>
                 <div id="results-subtitle" class="subtitle">Métricas consolidadas e auditadas em tempo real.</div>
@@ -424,10 +455,19 @@
                 </button>
             </div>
 
+            <!-- TELA 4: RELATÓRIO DETALHADO (ADMIN 0911) -->
             <div id="screen-report" class="screen">
                 <h2>Painel de Auditoria Interna</h2>
                 <div class="subtitle">Ambiente exclusivo da mesa diretora e comitê eleitoral do IEL.</div>
                 
+                <!-- NOVO COMPONENTE: TOP 3 PROJETOS MAIS VOTADOS -->
+                <div class="audit-top-podium">
+                    <div class="podium-title">📊 Propostas Líderes (Top 3)</div>
+                    <div id="podium-list">
+                        <!-- Gerado via JS -->
+                    </div>
+                </div>
+
                 <div class="report-summary">
                     <span>Amostragens Registradas</span>
                     <span id="report-total-counter" class="report-badge">0</span>
@@ -611,8 +651,28 @@
         function abrirRelatorio() {
             const tbody = document.getElementById('report-table-body');
             const totalCounter = document.getElementById('report-total-counter');
-            tbody.innerHTML = ""; totalCounter.innerText = historicoVotosCompleto.length;
+            const podiumList = document.getElementById('podium-list');
+            
+            tbody.innerHTML = ""; 
+            podiumList.innerHTML = "";
+            totalCounter.innerText = historicoVotosCompleto.length;
 
+            // Ordena os projetos para tirar o Top 3
+            const entradasOrdenadas = Object.entries(bancoDeVotos).sort((a, b) => b[1] - a[1]);
+            
+            // Renderiza o Top 3 no painel de auditoria
+            for (let i = 0; i < 3; i++) {
+                if (entradasOrdenadas[i]) {
+                    const nome = entradasOrdenadas[i][0];
+                    const votos = entradasOrdenadas[i][1];
+                    const item = document.createElement('div');
+                    item.className = 'podium-item';
+                    item.innerHTML = `<span><strong>${i + 1}º</strong> — ${nome}</span> <span>${votos} ${votos === 1 ? 'voto' : 'votos'}</span>`;
+                    podiumList.appendChild(item);
+                }
+            }
+
+            // Popula a tabela histórica
             if (historicoVotosCompleto.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="2" class="no-data">Nenhum registro encontrado no servidor central.</td></tr>`;
             } else {
