@@ -451,7 +451,8 @@
                     <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Educação Executiva"> 4. Educação Executiva</label>
                     <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Estratégia e Articulação"> 5. Estratégia e Articulação</label>
                     <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Gestão Empresarial"> 6. Gestão Empresarial</label>
-                    <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Pesquisa e Inovação"> 7. Pesquisa e Inovação</label>
+                    <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Parcerias"> 7. Parcerias</label>
+                    <label class="option" onclick="destacarOpcao(this)"><input type="radio" name="project" value="Pesquisa e Inovação"> 8. Pesquisa e Inovação</label>
                 </div>
                 
                 <div id="voting-error" class="error-msg"></div>
@@ -522,7 +523,8 @@
 
         const listaVotantesPermitidos = ["Bárbara", "Carol", "Cibele", "Gabriella", "Hugo", "Madu", "Naiara", "Vitória"];
         
-        let bancoDeVotos = { "Ações Internas": 0, "COD": 0, "Desenvolvimento de carreiras": 0, "Educação Executiva": 0, "Estratégia e Articulação": 0, "Gestão Empresarial": 0, "Pesquisa e Inovação": 0 };
+        // OPÇÃO ADICIONADA AQUI: Parcerias
+        let bancoDeVotos = { "Ações Internas": 0, "COD": 0, "Desenvolvimento de carreiras": 0, "Educação Executiva": 0, "Estratégia e Articulação": 0, "Gestão Empresarial": 0, "Parcerias": 0, "Pesquisa e Inovação": 0 };
         let matriculasQueJaVotaram = [];
         let historicoVotosCompleto = [];
         let matriculaAtual = "";
